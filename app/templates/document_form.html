@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}Форма клиента{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4 mt-5">
+    <h2 class="text-center mb-4">Форма клиента</h2>
+    <form method="POST" action="{{ url_for('docs.create') }}">
+        <div class="mb-3">
+            <label class="form-label">ФИО</label>
+            <input type="text" name="full_name" class="form-control" value="{{ doc.full_name if doc else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Дата рождения</label>
+            <input type="date" name="birth_date" class="form-control" value="{{ doc.birth_date.strftime('%Y-%m-%d') if doc else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Телефон</label>
+            <input type="text" name="phone" class="form-control" value="{{ doc.phone if doc else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="{{ doc.email if doc else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Адрес</label>
+            <input type="text" name="address" class="form-control" value="{{ doc.address if doc else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Примечание</label>
+            <textarea name="notes" class="form-control" rows="3">{{ doc.notes if doc else '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+    </form>
+</div>
+{% endblock %}

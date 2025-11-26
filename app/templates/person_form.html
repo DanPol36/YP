@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}Форма клиента{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4 mt-5">
+    <h2 class="text-center mb-4">Форма клиента</h2>
+    <form method="POST" action="{% if person %}{{ url_for('people.edit_person', fio=person['ФИО'] if person.get('ФИО') else person.get('fio')) }}{% else %}{{ url_for('people.add_person') }}{% endif %}">
+        <div class="mb-3">
+            <label class="form-label">ФИО</label>
+            <input type="text" name="fio" class="form-control" value="{{ person['ФИО'] if person and person.get('ФИО') else person.fio if person else '' }}" required {% if person %}readonly{% endif %}>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Пол</label>
+            <input type="text" name="gender" class="form-control" value="{{ person['Пол'] if person and person.get('Пол') else person.gender if person else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Возраст</label>
+            <input type="number" name="age" class="form-control" value="{{ person['Возраст'] if person and person.get('Возраст') else person.age if person else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Дата рождения</label>
+            <input type="date" name="birth_date" class="form-control" value="{{ person['Дата_рождения'] if person and person.get('Дата_рождения') else person.birth_date if person else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Телефон</label>
+            <input type="text" name="phone" class="form-control" value="{{ person['Номер_телефона'] if person and person.get('Номер_телефона') else person.phone if person else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="{{ person['Почта'] if person and person.get('Почта') else person.email if person else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Адрес</label>
+            <input type="text" name="address" class="form-control" value="{{ person['Адрес'] if person and person.get('Адрес') else person.address if person else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Примечания</label>
+            <textarea name="notes" class="form-control" rows="3">{{ person['Примечания'] if person and person.get('Примечания') else person.notes if person else '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Сохранить</button>
+    </form>
+</div>
+{% endblock %}

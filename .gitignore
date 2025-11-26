@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.env
+instance.db
+*.sqlite
+venv/
+.vscode/
