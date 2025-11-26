@@ -1,0 +1,47 @@
+<!-- app/templates/clients.html -->
+{% extends "layout.html" %}
+{% block title %}Список клиентов{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Список клиентов</h1>
+    <a class="btn btn-success" href="{{ url_for('people.add_person') }}">Добавить клиента</a>
+</div>
+
+{% if people %}
+<div class="table-responsive">
+<table class="table table-striped table-hover">
+    <thead class="table-primary">
+        <tr>
+            <th>ФИО</th>
+            <th>Пол</th>
+            <th>Возраст</th>
+            <th>Телефон</th>
+            <th>Email</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in people %}
+        <tr>
+            <td><strong>{{ p.fio }}</strong></td>
+            <td>{{ p.gender }}</td>
+            <td>{{ p.age }}</td>
+            <td>{{ p.phone }}</td>
+            <td>{{ p.email }}</td>
+            <td>
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('people.view_person', fio=p.fio) }}">Просмотр</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('people.edit_person', fio=p.fio) }}">Редактировать</a>
+                <form method="post" action="{{ url_for('people.delete_person', fio=p.fio) }}" style="display:inline" onsubmit="return confirm('Удалить клиента?');">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<div class="alert alert-info">Клиентов пока нет</div>
+{% endif %}
+{% endblock %}

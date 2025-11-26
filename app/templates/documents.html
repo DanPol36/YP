@@ -1,0 +1,51 @@
+<!-- app/templates/clients.html -->
+{% extends "layout.html" %}
+
+{% block title %}Список клиентов{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Список клиентов</h1>
+    
+    <a href="#" class="btn btn-primary mb-4">Добавить клиента</a>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>ФИО</th>
+                    <th>Пол</th>
+                    <th>Возраст</th>
+                    <th>Адрес</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Дата рождения</th>
+                    <th>Примечание</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if people|length == 0 %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            Клиентов пока нет
+                        </td>
+                    </tr>
+                {% else %}
+                    {% for p in people %}
+                    <tr>
+                        <td><strong>{{ p.fio }}</strong></td>
+                        <td>{{ p.gender or '—' }}</td>
+                        <td>{{ p.age or '—' }}</td>
+                        <td>{{ p.address or '—' }}</td>
+                        <td>{{ p.phone or '—' }}</td>
+                        <td>{{ p.email or '—' }}</td>
+                        <td>{{ p.birth_date or '—' }}</td>
+                        <td>{{ p.notes or '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

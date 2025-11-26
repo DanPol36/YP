@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}Просмотр клиента{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4 mt-5">
+    <h2 class="text-center mb-4">Просмотр клиента</h2>
+    <dl class="row">
+        <dt class="col-sm-3">ФИО</dt>
+        <dd class="col-sm-9">{{ doc.full_name }}</dd>
+        
+        <dt class="col-sm-3">Возраст</dt>
+        <dd class="col-sm-9">{{ doc.age }}</dd>
+        
+        <dt class="col-sm-3">Телефон</dt>
+        <dd class="col-sm-9">{{ doc.phone }}</dd>
+        
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">{{ doc.email or '' }}</dd>
+        
+        <dt class="col-sm-3">Адрес</dt>
+        <dd class="col-sm-9">{{ doc.address or '' }}</dd>
+        
+        <dt class="col-sm-3">Примечание</dt>
+        <dd class="col-sm-9">{{ doc.notes or '' }}</dd>
+    </dl>
+    <a href="{{ url_for('docs.index') }}" class="btn btn-secondary">Назад</a>
+</div>
+{% endblock %}

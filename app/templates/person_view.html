@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}Просмотр клиента{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4 mt-5">
+    <h2 class="mb-3">{{ person['ФИО'] if person.get('ФИО') else person.fio }}</h2>
+    <ul class="list-group mb-3">
+        <li class="list-group-item"><strong>Пол:</strong> {{ person['Пол'] or person.gender }}</li>
+        <li class="list-group-item"><strong>Возраст:</strong> {{ person['Возраст'] or person.age }}</li>
+        <li class="list-group-item"><strong>Дата рождения:</strong> {{ person['Дата_рождения'] or person.birth_date }}</li>
+        <li class="list-group-item"><strong>Телефон:</strong> {{ person['Номер_телефона'] or person.phone }}</li>
+        <li class="list-group-item"><strong>Email:</strong> {{ person['Почта'] or person.email }}</li>
+        <li class="list-group-item"><strong>Адрес:</strong> {{ person['Адрес'] or person.address }}</li>
+        <li class="list-group-item"><strong>Примечания:</strong> {{ person['Примечания'] or person.notes }}</li>
+    </ul>
+    <a class="btn btn-secondary" href="{{ url_for('people.edit_person', fio=person['ФИО'] if person.get('ФИО') else person.fio) }}">Редактировать</a>
+    <a class="btn btn-outline-primary" href="{{ url_for('people.get_people') }}">Назад к списку</a>
+</div>
+{% endblock %}

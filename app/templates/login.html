@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4 mt-5 mx-auto" style="max-width: 400px;">
+    <h2 class="text-center mb-4">Вход</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Логин</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Пароль</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Войти</button>
+    </form>
+</div>
+{% endblock %}
