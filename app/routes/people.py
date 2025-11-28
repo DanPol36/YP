@@ -56,7 +56,7 @@ def add_person():
     return render_template("person_form.html", person=None)
 
 
-# ——— РЕДАКТИРОВАНИЕ КЛИЕНТА ———
+#РЕДАКТИРОВАНИЕ КЛИЕНТА 
 @people_bp.route('/<path:fio>/edit', methods=['GET', 'POST'])
 def edit_person(fio):
     db = current_app.extensions['sqlalchemy']

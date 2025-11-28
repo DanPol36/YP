@@ -13,7 +13,7 @@ with app.app_context():
             client.post('/login', data={'username':'admin', 'password':'12345'})
             # пример запросов для профилирования:
             client.get('/clients/')
-            client.get('/clients/create')   # GET формы
+            client.get('/clients/create')   
             # если нужно отправить POST (создать тестовую запись):
             client.post('/clients/create', data={
                 'fio': 'Тест Тестов',

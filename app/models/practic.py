@@ -1,12 +1,11 @@
-# models/practic.py
 from sqlalchemy import Column, Integer, String, Date
 from instance.database import Base
 
 class Person(Base):
-    __tablename__ = "practic2"          # имя твоей таблицы в БД
-    __table_args__ = {'schema': 'public'}  # если она в схеме public
+    __tablename__ = "practic2"         
+    __table_args__ = {'schema': 'public'} 
 
-    id = Column(Integer, primary_key=True, autoincrement=True)  # если нет — добавим
+    id = Column(Integer, primary_key=True, autoincrement=True)  
     ФИО = Column(String)
     Пол = Column(String)
     Адрес = Column(String)

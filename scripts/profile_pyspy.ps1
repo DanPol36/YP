@@ -1,33 +1,3 @@
-<#
-.SYNOPSIS
-  Профилирование приложения с помощью py-spy и генерация flamegraph (SVG).
-
-.DESCRIPTION
-  Скрипт может запустить `python run.py` в фоне, выполнить небольшую нагрузку на
-  endpoint `/clients/`, затем записать профиль с помощью `py-spy` (attach по PID)
-  и сохранить результат как `flame_YYYYMMDD_HHMMSS.svg` в текущей папке.
-
-.PARAMETER Duration
-  Длительность записи профиля в секундах (по умолчанию 15).
-
-.PARAMETER Requests
-  Количество HTTP-запросов для генерации нагрузки перед записью (по умолчанию 50).
-
-.PARAMETER StartServer
-  Если указан, скрипт запустит `python run.py` в фоне и будет профилировать этот процесс.
-
-.PARAMETER Pid
-  PID существующего Python-процесса для attach. Если не указан, скрипт попытается найти
-  процесс с `run.py` в командной строке.
-
-Примеры:
-  # Запустить сервер, сделать нагрузку и записать 20 секунд
-  .\profile_pyspy.ps1 -StartServer -Duration 20 -Requests 100
-
-  # Присоединиться к уже запущенному процессу 12345 и записать 15 секунд
-  .\profile_pyspy.ps1 -Pid 12345
-#>
-
 param(
     [int]$Duration = 15,
     [int]$Requests = 50,
