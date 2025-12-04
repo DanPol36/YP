@@ -1,0 +1,66 @@
+%% Architecture diagram (Mermaid) — Подробная блок-схема проекта (на русском)
+%% Файл: docs/architecture_diagram.mmd
+%% Рендеринг: используйте mermaid-cli (`mmdc`) или онлайн-редактор Mermaid
+
+flowchart LR
+  subgraph ENTRY [Точка входа]
+    RUN["run.py\n(создаёт приложение через create_app())"]
+  end
+
+  subgraph APP[Flask приложение — `app/`]
+    INIT["app/__init__.py\ncreate_app() — регистрирует blueprints, инициализирует db и миграции"]
+    MODELS["app/models/\n(User, Document, Order и др.)"]
+    ROUTES["app/routes/\nBlueprints: auth, documents, people, ..."]
+    TEMPL["templates/\nJinja2 шаблоны"]
+  end
+
+  subgraph LEGACY[Legacy / raw SQL]
+    INST["instance/database.py\nengine + Base (declarative) для legacy таблиц)"]
+    PRACTIC["app/models/practic.py\nLegacy таблица practic2 (русские имена столбцов)"]
+    PEOPLE_SEARCH["app/routes/people_search.py\nЛогика фильтрации/запросов к practic2"]
+  end
+
+  subgraph ORDERS[Заказы и Order model]
+    ORDER_MODEL["app/models/order.py\nOrder ORM (таблица order2)\nключ: номер_клиента_... (client_key)"]
+  end
+
+  subgraph SCRIPTS[Скрипты и миграции]
+    SCRIPTS_DIR["scripts/\nутилиты, миграции, seed/профилинг"]
+    MIGR["migrations/\nFlask-Migrate / Alembic" ]
+  end
+
+  subgraph STATIC[static / docs]
+    TPL["templates/ (html) + static/ (css, js)"]
+    DOCS["docs/ — диаграммы, документация"]
+  end
+
+  RUN --> INIT
+  INIT --> ROUTES
+  INIT --> MODELS
+  INIT --> MIGR
+  ROUTES --> TEMPL
+
+  %% People flow: mix of ORM and raw SQL
+  ROUTES -->|registers| PEOPLE_SEARCH
+  PEOPLE_SEARCH -->|uses Base/engine| INST
+  PEOPLE_SEARCH --> PRACTIC
+  ROUTES -->|view_person / edit| PRACTIC
+
+  %% Orders
+  ROUTES --> ORDER_MODEL
+  ORDER_MODEL -->|FK-like client_key linking| PRACTIC
+
+  %% Scripts / docs
+  SCRIPTS_DIR --> MIGR
+  INIT --> SCRIPTS_DIR
+
+  %% Notes / annotations
+  style LEGACY fill:#fff7e6,stroke:#f1c40f
+  style ORDERS fill:#e6f7ff,stroke:#3498db
+  style APP fill:#e9f7ef,stroke:#2ecc71
+  classDef small font-size:12px
+
+  %% Explanatory notes at bottom
+  class RUN,INIT,ROUTES,MODELS,PEOPLE_SEARCH,ORDER_MODEL small
+
+  %% End

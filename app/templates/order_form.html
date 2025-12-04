@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}Форма заказа{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4 mt-5">
+    <h2 class="mb-3">{% if order %}Редактировать заказ{% else %}Новый заказ{% endif %}</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Название</label>
+            <input name="название" class="form-control" value="{{ order['название'] if order and order.get('название') else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Статус заказа</label>
+            <select name="статус_заказа" class="form-control">
+                {% set cur = order['статус_заказа'] if order and order.get('статус_заказа') else '' %}
+                <option value="">-- выбрать --</option>
+                <option value="Новый" {{ 'selected' if cur == 'Новый' }}>Новый</option>
+                <option value="В работе" {{ 'selected' if cur == 'В работе' }}>В работе</option>
+                <option value="Завершён" {{ 'selected' if cur == 'Завершён' }}>Завершён</option>
+                <option value="Оплачен" {{ 'selected' if cur == 'Оплачен' }}>Оплачен</option>
+                <option value="Отменён" {{ 'selected' if cur == 'Отменён' }}>Отменён</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Цена</label>
+            <input name="цена" type="number" class="form-control" value="{{ order['цена'] if order and order.get('цена') is not none else 0 }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Примечания</label>
+            <textarea name="примечания" class="form-control">{{ order['примечания'] if order and order.get('примечания') else '' }}</textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Сохранить</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('people.view_orders', fio=person['ФИО'] if person.get('ФИО') else person.fio) }}">Отмена</a>
+    </form>
+</div>
+{% endblock %}

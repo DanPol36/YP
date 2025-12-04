@@ -16,4 +16,29 @@
     <a class="btn btn-secondary" href="{{ url_for('people.edit_person', fio=person['ФИО'] if person.get('ФИО') else person.fio) }}">Редактировать</a>
     <a class="btn btn-outline-primary" href="{{ url_for('people.get_people') }}">Назад к списку</a>
 </div>
+{% if orders %}
+<div class="card shadow p-4 mt-4">
+    <h3>Заказы клиента</h3>
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    {% for k in orders[0].keys() %}
+                    <th>{{ k }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    {% for v in o.values() %}
+                    <td>{{ v }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

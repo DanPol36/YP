@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block title %}Заказы клиента{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4 mt-5">
+    <h2 class="mb-3">Заказы: {{ person['ФИО'] if person.get('ФИО') else person.fio }}</h2>
+    <ul class="list-group mb-3">
+        <li class="list-group-item"><strong>Телефон:</strong> {{ person['Номер_телефона'] or person.phone }}</li>
+        <li class="list-group-item"><strong>Email:</strong> {{ person['Почта'] or person.email }}</li>
+    </ul>
+    <a class="btn btn-outline-primary mb-3" href="{{ url_for('people.get_people') }}">Назад к списку</a>
+    <a class="btn btn-success mb-3" href="{{ url_for('people.create_order', fio=person['ФИО'] if person.get('ФИО') else person.fio) }}">Добавить заказ</a>
+
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-secondary">
+                <tr>
+                    {% for k in orders[0].keys() %}
+                        {% if k not in ['created_at', 'updated_at', 'created', 'updated'] %}
+                            <th>{{ k|replace('_',' ')|title }}</th>
+                        {% endif %}
+                    {% endfor %}
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    {% for k in orders[0].keys() %}
+                        {% if k not in ['created_at', 'updated_at', 'created', 'updated'] %}
+                            {% if loop.first and o.get('_ordinal') is not none %}
+                                <td>{{ o['_ordinal'] }}</td>
+                            {% else %}
+                                <td>{{ o[k] }}</td>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    <td>
+                        {# determine pk value: prefer any key that contains 'номер' and 'заказ' or fallback to first key #}
+                        {% set pk_key = None %}
+                        {% for kk in orders[0].keys() %}
+                            {% if pk_key is none and 'номер' in kk.lower() and 'заказ' in kk.lower() %}
+                                {% set pk_key = kk %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if pk_key is none %}
+                            {% set pk_key = orders[0].keys()|list|first %}
+                        {% endif %}
+                        {% set pk_val = o[pk_key] %}
+
+                        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('people.edit_order', fio=person['ФИО'] if person.get('ФИО') else person.fio, pk=pk_val) }}">Ред.</a>
+                        <form method="post" action="{{ url_for('people.delete_order', fio=person['ФИО'] if person.get('ФИО') else person.fio, pk=pk_val) }}" style="display:inline" onsubmit="return confirm('Удалить заказ?');">
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Удал.</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">Заказы для этого клиента не найдены.</div>
+    {% endif %}
+</div>
+{% endblock %}
