@@ -19,6 +19,9 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'super-secret-2025')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # URL to Metabase (optional). If set, templates can show a link to Metabase UI.
+    # Default opens the databases view for the local Postgres datasource.
+    app.config['METABASE_URL'] = os.getenv('METABASE_URL', 'http://localhost:3000/browse/databases/2-postgres')
 
     db.init_app(app)
     migrate = Migrate(app, db)
@@ -38,5 +41,12 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+    # expose some config to templates (e.g. METABASE_URL)
+    @app.context_processor
+    def inject_config():
+        return {
+            'metabase_url': app.config.get('METABASE_URL')
+        }
 
     return app

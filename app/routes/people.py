@@ -1,9 +1,141 @@
 # app/routes/people.py
 from flask import Blueprint, render_template, request, current_app, redirect, url_for, flash
+import csv
+import io
+from werkzeug.utils import secure_filename
 from .people_search import search_people
 
 # Используем префикс `/clients`, чтобы не конфликтовать с `/documents`
 people_bp = Blueprint('people', __name__, url_prefix='/clients', template_folder='../templates')
+
+
+@people_bp.route('/import', methods=['POST'])
+def import_clients():
+    """Import clients from uploaded CSV or XLSX file.
+
+    Supported formats: CSV (utf-8 or utf-8-sig) and XLSX (requires openpyxl).
+    Expected columns (either Russian or English keys):
+      ФИО / fio
+      Пол / gender
+      Адрес / address
+      Возраст / age
+      Дата_рождения / birth_date
+      Номер_телефона / phone
+      Почта / email
+      Примечания / notes
+    """
+    db = current_app.extensions['sqlalchemy']
+    uploaded = request.files.get('file')
+    if not uploaded:
+        flash('Файл не загружен', 'warning')
+        return redirect(url_for('people.get_people'))
+
+    filename = secure_filename(uploaded.filename or '')
+    if filename.lower().endswith('.csv'):
+        stream = io.TextIOWrapper(uploaded.stream, encoding='utf-8-sig')
+        reader = csv.DictReader(stream)
+        rows = list(reader)
+    elif filename.lower().endswith('.xlsx'):
+        try:
+            import openpyxl
+        except Exception:
+            flash('Для импорта XLSX требуется пакет openpyxl. Установите его и перезапустите.', 'danger')
+            return redirect(url_for('people.get_people'))
+        wb = openpyxl.load_workbook(uploaded, read_only=True)
+        ws = wb.active
+        it = ws.values
+        try:
+            headers = [str(h).strip() for h in next(it)]
+        except StopIteration:
+            flash('Файл пустой', 'warning')
+            return redirect(url_for('people.get_people'))
+        rows = []
+        for r in it:
+            row = {headers[i]: (r[i] if i < len(r) else '') for i in range(len(headers))}
+            rows.append(row)
+    else:
+        flash('Поддерживаются только файлы .csv и .xlsx', 'warning')
+        return redirect(url_for('people.get_people'))
+
+    # map possible headers to target columns
+    def map_row(r):
+        # lowercase keys without spaces/underscores for flexible matching
+        normalized = {}
+        for k, v in r.items():
+            if k is None:
+                continue
+            key = str(k).strip().lower().replace(' ', '_')
+            normalized[key] = v
+
+        def pick(*cands):
+            for c in cands:
+                kc = c.lower()
+                if kc in normalized:
+                    return normalized[kc]
+            return None
+
+        return {
+            'fio': pick('ФИО', 'fio'),
+            'gender': pick('Пол', 'gender'),
+            'address': pick('Адрес', 'address'),
+            'age': pick('Возраст', 'age'),
+            'birth_date': pick('Дата_рождения', 'birth_date', 'birthdate'),
+            'phone': pick('Номер_телефона', 'phone', 'phone_number', 'tel'),
+            'email': pick('Почта', 'email', 'e-mail'),
+            'notes': pick('Примечания', 'notes', 'comments')
+        }
+
+    success = 0
+    failed = 0
+    errors = []
+    max_rows = current_app.config.get('IMPORT_MAX_ROWS', 2000)
+    if len(rows) > max_rows:
+        flash(f'Файл слишком большой ({len(rows)} строк). Ограничение {max_rows}.', 'danger')
+        return redirect(url_for('people.get_people'))
+
+    insert_sql = db.text('''
+        INSERT INTO practic2 (
+            "ФИО", "Пол", "Адрес", "Возраст",
+            "Дата_рождения", "Номер_телефона", "Почта", "Примечания"
+        ) VALUES (
+            :fio, :gender, :address, :age,
+            :birth_date, :phone, :email, :notes
+        )
+    ''')
+
+    for idx, raw in enumerate(rows, start=1):
+        mapped = map_row(raw)
+        params = {
+            'fio': mapped.get('fio') or '',
+            'gender': mapped.get('gender') or None,
+            'address': mapped.get('address') or None,
+            'age': mapped.get('age') or None,
+            'birth_date': mapped.get('birth_date') or None,
+            'phone': mapped.get('phone') or None,
+            'email': mapped.get('email') or None,
+            'notes': mapped.get('notes') or None
+        }
+        try:
+            db.session.execute(insert_sql, params)
+            db.session.commit()
+            success += 1
+        except Exception as e:
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
+            failed += 1
+            errors.append(f'Line {idx}: {e}')
+
+    msg = f'Импорт завершён: {success} добавлено.'
+    if failed:
+        msg += f' {failed} ошибок.'
+        current_app.logger.warning('Import clients: %s', errors[:5])
+        flash(msg + ' Первые ошибки: ' + '; '.join(errors[:3]), 'warning')
+    else:
+        flash(msg, 'success')
+
+    return redirect(url_for('people.get_people'))
 
 
 @people_bp.route('/')

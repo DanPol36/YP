@@ -5,3 +5,4 @@ Flask-Migrate
 SQLAlchemy
 python-dotenv
 Jinja2
+openpyxl
