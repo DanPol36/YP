@@ -63,7 +63,6 @@ class TestAuthRoutes:
     
     def test_protected_route_requires_login(self, client):
         response = client.get('/clients/', follow_redirects=False)
-        # Should redirect to login (could be 302 or 200 depending on Flask-Login behavior)
         assert response.status_code in [302, 200, 303]
     
     def test_change_password_requires_login(self, client):
