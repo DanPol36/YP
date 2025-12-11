@@ -6,3 +6,5 @@ SQLAlchemy
 python-dotenv
 Jinja2
 openpyxl
+pytest
+pytest-cov
